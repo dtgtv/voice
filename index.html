@@ -628,7 +628,7 @@ function render(){
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
           <button onclick="event.stopPropagation();toggleEmpathy(${s.id},this)" style="text-align:center;font-size:12px;color:#555555;padding:8px 6px;background:#F5F5F5;border:1px solid #E0E0E0;border-radius:6px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;width:100%;">나도 당했어요 <strong style="color:#111111;">${s.emp.toLocaleString()}</strong></button>
-          <button class="emp-btn ${myVoteForStory(${s.id})?'on':''}" onclick="event.stopPropagation();handleLawsuitCardClick(${s.id},this)" id="lsBtn_${s.id}" style="width:100%;justify-content:center;border-radius:6px;font-size:12px;padding:8px 6px;">
+          <button class="emp-btn ${myVoteForStory(s.id)?'on':''}" onclick="event.stopPropagation();handleLawsuitCardClick(${s.id},this)" id="lsBtn_${s.id}" style="width:100%;justify-content:center;border-radius:6px;font-size:12px;padding:8px 6px;">
             소송 가능성 있어요 <strong>${(s.votes.lawyerVer+s.votes.lawyerUn+s.votes.normal).toLocaleString()}</strong>
           </button>
         </div>
