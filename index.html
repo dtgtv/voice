@@ -461,7 +461,7 @@ nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-con
     <div style="font-size:11px;color:#999999;margin-bottom:20px;">복사 후 메모장이나 카카오톡 나에게 보내기에 저장해두세요</div>
     <div style="display:flex;gap:8px;">
       <button onclick="document.getElementById('logoutPopup').classList.remove('open')" style="flex:1;padding:12px;background:transparent;border:1px solid var(--border);color:var(--ink2);border-radius:6px;font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">취소</button>
-      <button onclick="doLogout()" style="flex:1;padding:12px;background:#E8192C;color:white;border:none;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">토큰 저장했어요, 로그아웃</button>
+      <button id="doLogoutBtn" onclick="doLogout()" disabled style="flex:1;padding:12px;background:#CCCCCC;color:white;border:none;border-radius:6px;font-size:13px;font-weight:500;cursor:not-allowed;font-family:'Noto Sans KR',sans-serif;">토큰 저장했어요, 로그아웃</button>
     </div>
   </div>
 </div>
@@ -1106,6 +1106,14 @@ function toggleLawyerMode(){
 
 function confirmLogout(){
   document.getElementById('logoutTokenDisplay').textContent=BID;
+  const logoutBtn=document.getElementById('doLogoutBtn');
+  if(logoutBtn){
+    logoutBtn.disabled=true;
+    logoutBtn.style.background='#CCCCCC';
+    logoutBtn.style.cursor='not-allowed';
+  }
+  const copyBtn=document.getElementById('copyLogoutBtn');
+  if(copyBtn){ copyBtn.textContent='복사'; copyBtn.style.background='#111111'; }
   document.getElementById('logoutPopup').classList.add('open');
 }
 
@@ -1114,7 +1122,13 @@ function copyLogoutToken(){
     const btn=document.getElementById('copyLogoutBtn');
     btn.textContent='복사됨 ✓';
     btn.style.background='#333333';
-    setTimeout(()=>{btn.textContent='복사';btn.style.background='#111111';},2000);
+    setTimeout(()=>{btn.textContent='복사됨 ✓';},2000);
+    const logoutBtn=document.getElementById('doLogoutBtn');
+    if(logoutBtn){
+      logoutBtn.disabled=false;
+      logoutBtn.style.background='#E8192C';
+      logoutBtn.style.cursor='pointer';
+    }
   });
 }
 
