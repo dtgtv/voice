@@ -1231,7 +1231,7 @@ async function loadComments(storyId){
       </div>
       <div style="font-size:13px;color:var(--ink);line-height:1.6;">${c.body}</div>
       ${c.card_url?`<div style="margin-top:10px;">
-        <img src="${c.card_url}" style="max-width:100%;max-height:180px;border-radius:4px;border:1px solid #E0E0E0;cursor:pointer;" onclick="window.open('${c.card_url}','_blank')" alt="변호사 명함">
+        <img src="${c.card_url}" style="max-width:100%;max-height:180px;border-radius:4px;border:1px solid #E0E0E0;cursor:pointer;" onclick="window.open(this.src,'_blank')" alt="변호사 명함">
         <div style="font-size:11px;color:#999999;margin-top:4px;">클릭하면 크게 볼 수 있어요</div>
       </div>`:''}
     </div>`;
