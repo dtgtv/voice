@@ -621,14 +621,14 @@ function render(){
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         같은 피해 유형 사연 ${same.length}건 더 있어요 — 같이 보기
       </div>`:''}
-      <div class="card-bottom">
-        <div class="meta">
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+        <div class="meta" style="margin-bottom:10px;">
           <span class="meta-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${(s.views||0).toLocaleString()}</span>
           <span class="meta-i">${s.time}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
-          <span style="font-size:11px;color:#555555;padding:5px 10px;background:#F5F5F5;border:1px solid #E0E0E0;border-radius:20px;white-space:nowrap;">나도 당했어요 <strong style="color:#111111;">${s.emp.toLocaleString()}</strong></span>
-          <button class="emp-btn ${on?'on':''}" onclick="event.stopPropagation();toggleEmp(${s.id},this)" id="empBtn_${s.id}" style="white-space:nowrap;font-size:11px;padding:6px 12px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <span style="text-align:center;font-size:12px;color:#555555;padding:8px 6px;background:#F5F5F5;border:1px solid #E0E0E0;border-radius:6px;">나도 당했어요 <strong style="color:#111111;">${s.emp.toLocaleString()}</strong></span>
+          <button class="emp-btn ${on?'on':''}" onclick="event.stopPropagation();toggleEmp(${s.id},this)" id="empBtn_${s.id}" style="width:100%;justify-content:center;border-radius:6px;font-size:12px;padding:8px 6px;">
             소송 가능성 있어요 <strong>${(s.votes.lawyerVer+s.votes.lawyerUn+s.votes.normal).toLocaleString()}</strong>
           </button>
         </div>
