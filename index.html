@@ -628,7 +628,7 @@ function render(){
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
           <button onclick="event.stopPropagation();toggleEmpathy(${s.id},this)" style="text-align:center;font-size:12px;color:#555555;padding:8px 6px;background:#F5F5F5;border:1px solid #E0E0E0;border-radius:6px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;width:100%;">나도 당했어요 <strong style="color:#111111;">${s.emp.toLocaleString()}</strong></button>
-          <button class="emp-btn ${on?'on':''}" onclick="event.stopPropagation();toggleEmp(${s.id},this)" id="empBtn_${s.id}" style="width:100%;justify-content:center;border-radius:6px;font-size:12px;padding:8px 6px;">
+          <button class="emp-btn ${myVoteForStory(${s.id})?'on':''}" onclick="event.stopPropagation();handleLawsuitCardClick(${s.id},this)" id="lsBtn_${s.id}" style="width:100%;justify-content:center;border-radius:6px;font-size:12px;padding:8px 6px;">
             소송 가능성 있어요 <strong>${(s.votes.lawyerVer+s.votes.lawyerUn+s.votes.normal).toLocaleString()}</strong>
           </button>
         </div>
@@ -642,6 +642,42 @@ function loadMore(){disp+=4;render();}
 function toggleEmpathy(id, btn){
   const empBtn=document.getElementById('empBtn_'+id);
   toggleEmp(id, empBtn||btn);
+}
+
+let myCardVotes={};
+
+function myVoteForStory(id){
+  return !!myCardVotes[id];
+}
+
+async function handleLawsuitCardClick(id, btn){
+  if(!LAWYER_MODE){
+    alert('변호사 모드에서만 소송 가능성 투표를 할 수 있어요.\n상단 [변호사] 버튼을 켜주세요.');
+    return;
+  }
+  const s=stories.find(x=>x.id===id); if(!s) return;
+  if(myCardVotes[id]){
+    await sb.from('lawsuit_votes').delete().eq('story_id',id).eq('browser_id',BID);
+    delete myCardVotes[id];
+    s.votes.lawyerUn=Math.max(0,s.votes.lawyerUn-1);
+    btn.classList.remove('on');
+    await updateLawsuitPossible(id);
+  } else {
+    await sb.from('lawsuit_votes').insert({story_id:id,browser_id:BID,is_lawyer:true,is_verified:false});
+    myCardVotes[id]=true;
+    s.votes.lawyerUn++;
+    btn.classList.add('on');
+    await updateLawsuitPossible(id);
+    const {data:st}=await sb.from('stories').select('browser_id,title').eq('id',id).single();
+    if(st) await createNotification(st.browser_id,'lawyer',`⚖️ 변호사(미인증)가 "${st.title.slice(0,20)}..." 사연에 소송 가능 의견을 남겼어요`,id);
+  }
+  btn.querySelector('strong').textContent=(s.votes.lawyerVer+s.votes.lawyerUn+s.votes.normal).toLocaleString();
+  render();
+}
+
+async function loadMyLawsuitVotes(){
+  const {data}=await sb.from('lawsuit_votes').select('story_id').eq('browser_id',BID).eq('is_lawyer',true);
+  if(data) data.forEach(v=>{ myCardVotes[v.story_id]=true; });
 }
 
 async function toggleEmp(id,btn){
@@ -1377,6 +1413,7 @@ function shareX(){
     setTimeout(()=>document.getElementById('loginPopup').classList.add('open'),800);
   }
   await loadMyEmpathy();
+  await loadMyLawsuitVotes();
   await loadStories();
   const params=new URLSearchParams(window.location.search);
   const storyId=params.get('story');
