@@ -1211,16 +1211,21 @@ async function loadComments(storyId){
     const t=m<1?'방금 전':m<60?m+'분 전':Math.floor(m/60)<24?Math.floor(m/60)+'시간 전':Math.floor(m/1440)+'일 전';
     const isMine=c.browser_id===BID;
     return `<div style="background:var(--bg);border-radius:6px;padding:12px 14px;border:1px solid var(--border);">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div style="width:24px;height:24px;border-radius:50%;background:${isMine?'var(--green-bg)':'var(--accent2)'};display:flex;align-items:center;justify-content:center;font-size:11px;color:${isMine?'var(--green)':'var(--accent)'};font-weight:500;">${(c.nickname||'익명')[0]}</div>
-          <span style="font-size:12px;font-weight:500;color:var(--ink);">${c.nickname||'익명'}${c.is_lawyer?' <span style="font-size:11px;color:#555555;font-weight:400;">(변호사 미인증)</span>':''} ${isMine?'<span style="font-size:10px;color:#E8192C;font-weight:400;">나</span>':''}</span>
-          <span style="font-size:11px;color:var(--ink3);">${t}</span>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
+          <div style="width:26px;height:26px;border-radius:50%;background:${isMine?'#F0F0F0':'#FFF0F0'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:${isMine?'#111111':'#E8192C'};flex-shrink:0;">${(c.nickname||'익명')[0]}</div>
+          <div style="min-width:0;">
+            <div style="font-size:12px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              ${c.nickname||'익명'}${c.is_lawyer?' <span style="font-size:11px;color:#555555;font-weight:400;">(변호사 미인증)</span>':''}
+              ${isMine?'<span style="font-size:10px;color:#E8192C;font-weight:400;margin-left:3px;">나</span>':''}
+            </div>
+            <div style="font-size:11px;color:var(--ink3);margin-top:2px;">${t}</div>
+          </div>
         </div>
-        <div style="display:flex;gap:6px;">
+        <div style="flex-shrink:0;">
           ${isMine
-            ? `<button onclick="deleteComment(${c.id})" style="font-size:11px;color:var(--ink3);background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:3px;font-family:'Noto Sans KR',sans-serif;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--ink3)'">삭제</button>`
-            : `<button id="report-${c.id}" onclick="reportComment(${c.id},this)" style="font-size:11px;color:var(--ink3);background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:3px;font-family:'Noto Sans KR',sans-serif;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--ink3)'">신고</button>`
+            ? `<button onclick="deleteComment(${c.id})" style="font-size:11px;color:var(--ink3);background:none;border:1px solid var(--border);cursor:pointer;padding:4px 10px;border-radius:4px;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--ink3)';this.style.borderColor='var(--border)'">삭제</button>`
+            : `<button id="report-${c.id}" onclick="reportComment(${c.id},this)" style="font-size:11px;color:var(--ink3);background:none;border:1px solid var(--border);cursor:pointer;padding:4px 10px;border-radius:4px;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--ink3)';this.style.borderColor='var(--border)'">신고</button>`
           }
         </div>
       </div>
@@ -1230,7 +1235,6 @@ async function loadComments(storyId){
         <div style="font-size:11px;color:#999999;margin-top:4px;">클릭하면 크게 볼 수 있어요</div>
       </div>`:''}
     </div>`;
-  }).join('');
 }
 
 function toggleCardUpload(checked){
