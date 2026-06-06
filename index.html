@@ -262,21 +262,6 @@ nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-con
     <div id="dLaw" class="dlawbox">
       <div class="dlawttl">⚖️ 단체소송 가능성 있음</div>
       <div class="dlawdesc" id="dLawDesc"></div>
-      <div style="margin-top:14px;padding-top:14px;border-top:1px solid #E0E0E0;">
-        <div style="font-size:12px;color:#333333;margin-bottom:10px;font-weight:500;">변호사 의견 — 이 사건 소송 가능하다고 생각하시나요?</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-          <button id="voteNormalBtn" onclick="voteLawsuit(false,false)" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;border:1px solid #CCCCCC;background:transparent;font-size:12px;color:#555555;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s;">
-            👤 일반인 동의 <strong id="voteNormalCount">0</strong>
-          </button>
-          <button id="voteLawyerUnBtn" onclick="voteLawsuit(true,false)" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;border:1px solid rgba(26,122,86,0.3);background:transparent;font-size:12px;color:var(--green);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s;">
-            ⚖️ 미인증 변호사 동의 <strong id="voteLawyerUnCount">0</strong>
-          </button>
-          <button id="voteLawyerVerBtn" onclick="voteLawsuit(true,true)" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;border:1px solid rgba(26,122,86,0.3);background:transparent;font-size:12px;color:var(--green);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s;">
-            ✅ 인증 변호사 동의 <strong id="voteLawyerVerCount">0</strong>
-          </button>
-        </div>
-        <div style="font-size:11px;color:rgba(26,122,86,0.6);">인증 변호사 동의가 많을수록 단체소송 성사 가능성이 높아요</div>
-      </div>
     </div>
     <div id="dCl" class="dclbox"><div class="dclttl" id="dClTtl"></div><div id="dClList"></div></div>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);gap:8px;flex-wrap:wrap;">
@@ -287,9 +272,7 @@ nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-con
       </div>
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
         <span style="font-size:12px;color:#555555;padding:5px 10px;background:#F5F5F5;border:1px solid #E0E0E0;border-radius:20px;white-space:nowrap;">나도 당했어요 <strong id="dEmpN" style="color:#111111;"></strong></span>
-        <button class="emp-btn" id="dEmpBtn" onclick="empDetail()" style="white-space:nowrap;">
-          소송 가능성 있어요 <strong id="dLawVoteN">0</strong>
-        </button>
+        <div id="dLawsuitArea"></div>
       </div>
     </div>
     <div class="share-row">
@@ -600,22 +583,10 @@ function render(){
       <div class="card-title">${s.title}</div>
       <div class="card-body">${s.body}</div>
       ${s.law?`<div style="margin-top:12px;">
-        <div style="margin-bottom:8px;">
-          <div class="law-badge" style="margin-top:0;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>단체소송 가능성 있음</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:0;font-size:11px;color:#555555;flex-wrap:wrap;">
-          <span>변호사 <span style="color:#999999;font-size:10px;">(미인증 포함)</span></span>
-          <span style="margin:0 5px;color:#CCCCCC;">·</span>
-          <span style="font-weight:500;color:#111111;">${s.votes.lawyerVer+s.votes.lawyerUn}</span>
-          <span style="margin:0 12px;color:#E0E0E0;">|</span>
-          <span>일반</span>
-          <span style="margin:0 5px;color:#CCCCCC;">·</span>
-          <span style="font-weight:500;color:#111111;">${s.votes.normal}</span>
-        </div>
-        ${(s.votes.lawyerVer+s.votes.lawyerUn+s.votes.normal)>0?`
-        <div style="height:3px;background:#E0E0E0;border-radius:2px;overflow:hidden;margin-top:8px;">
-          <div style="height:100%;border-radius:2px;background:linear-gradient(90deg,#111111 ${Math.round(s.votes.lawyerVer/(s.votes.lawyerVer+s.votes.lawyerUn+s.votes.normal)*100)}%,#777777 ${Math.round((s.votes.lawyerVer+s.votes.lawyerUn)/(s.votes.lawyerVer+s.votes.lawyerUn+s.votes.normal)*100)}%,#AAAAAA 100%);width:100%;"></div>
-        </div>`:''}
+        ${LAWYER_MODE
+          ? `<button class="emp-btn ${myVoteForStory(s.id)?'on':''}" onclick="event.stopPropagation();handleLawsuitCardClick(${s.id},this)" id="lsBtn_${s.id}" style="border-radius:6px;font-size:12px;padding:7px 14px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;flex-shrink:0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>소송 가능성 있어요 <strong>${(s.votes.lawyerVer+s.votes.lawyerUn+s.votes.normal).toLocaleString()}</strong></button>`
+          : `<div class="law-badge" style="margin-top:0;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>단체소송 가능성 있음 <span style="font-size:10px;color:#999999;margin-left:4px;">${(s.votes.lawyerVer+s.votes.lawyerUn+s.votes.normal)>0?`· ${s.votes.lawyerVer+s.votes.lawyerUn+s.votes.normal}명`:''}</span></div>`
+        }
       </div>`:''}
       ${same.length>0?`<div class="pattern-bar" onclick="event.stopPropagation();setCl('${s.pat}')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
@@ -626,12 +597,7 @@ function render(){
           <span class="meta-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${(s.views||0).toLocaleString()}</span>
           <span class="meta-i">${s.time}</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-          <button onclick="event.stopPropagation();toggleEmpathy(${s.id},this)" style="text-align:center;font-size:12px;color:#555555;padding:8px 6px;background:#F5F5F5;border:1px solid #E0E0E0;border-radius:6px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;width:100%;">나도 당했어요 <strong style="color:#111111;">${s.emp.toLocaleString()}</strong></button>
-          <button class="emp-btn ${myVoteForStory(s.id)?'on':''}" onclick="event.stopPropagation();handleLawsuitCardClick(${s.id},this)" id="lsBtn_${s.id}" style="width:100%;justify-content:center;border-radius:6px;font-size:12px;padding:8px 6px;">
-            소송 가능성 있어요 <strong>${(s.votes.lawyerVer+s.votes.lawyerUn+s.votes.normal).toLocaleString()}</strong>
-          </button>
-        </div>
+        <button onclick="event.stopPropagation();toggleEmpathy(${s.id},this)" style="text-align:center;font-size:12px;color:#555555;padding:8px 6px;background:#F5F5F5;border:1px solid #E0E0E0;border-radius:6px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;width:100%;">나도 당했어요 <strong style="color:#111111;">${s.emp.toLocaleString()}</strong></button>
       </div>
     </div>`;
   }).join('');
@@ -651,32 +617,36 @@ function myVoteForStory(id){
 }
 
 async function handleLawsuitCardClick(id, btn){
-  if(!LAWYER_MODE){
-    alert('변호사 모드에서만 소송 가능성 투표를 할 수 있어요.\n상단 [변호사] 버튼을 켜주세요.');
-    return;
-  }
   const s=stories.find(x=>x.id===id); if(!s) return;
+  const isLawyer=LAWYER_MODE;
   if(myCardVotes[id]){
     await sb.from('lawsuit_votes').delete().eq('story_id',id).eq('browser_id',BID);
     delete myCardVotes[id];
-    s.votes.lawyerUn=Math.max(0,s.votes.lawyerUn-1);
+    if(isLawyer) s.votes.lawyerUn=Math.max(0,s.votes.lawyerUn-1);
+    else s.votes.normal=Math.max(0,s.votes.normal-1);
     btn.classList.remove('on');
     await updateLawsuitPossible(id);
   } else {
-    await sb.from('lawsuit_votes').insert({story_id:id,browser_id:BID,is_lawyer:true,is_verified:false});
+    await sb.from('lawsuit_votes').insert({story_id:id,browser_id:BID,is_lawyer:isLawyer,is_verified:false});
     myCardVotes[id]=true;
-    s.votes.lawyerUn++;
+    if(isLawyer) s.votes.lawyerUn++;
+    else s.votes.normal++;
     btn.classList.add('on');
     await updateLawsuitPossible(id);
     const {data:st}=await sb.from('stories').select('browser_id,title').eq('id',id).single();
-    if(st) await createNotification(st.browser_id,'lawyer',`⚖️ 변호사(미인증)가 "${st.title.slice(0,20)}..." 사연에 소송 가능 의견을 남겼어요`,id);
+    if(st){
+      const msg=isLawyer
+        ?`⚖️ 변호사(미인증)가 "${st.title.slice(0,20)}..." 사연에 소송 가능 의견을 남겼어요`
+        :`🤝 "${st.title.slice(0,20)}..." 사연에 소송 가능성 동의가 늘었어요`;
+      await createNotification(st.browser_id,'lawyer',msg,id);
+    }
   }
   btn.querySelector('strong').textContent=(s.votes.lawyerVer+s.votes.lawyerUn+s.votes.normal).toLocaleString();
   render();
 }
 
 async function loadMyLawsuitVotes(){
-  const {data}=await sb.from('lawsuit_votes').select('story_id').eq('browser_id',BID).eq('is_lawyer',true);
+  const {data}=await sb.from('lawsuit_votes').select('story_id').eq('browser_id',BID);
   if(data) data.forEach(v=>{ myCardVotes[v.story_id]=true; });
 }
 
@@ -737,7 +707,7 @@ async function openDetail(id){
   }else{cb.style.display='none';}
   document.getElementById('dMeta').textContent=`👁 ${(s.views||0).toLocaleString()} · ${s.time}`;
   document.getElementById('dEmpN').textContent=s.emp.toLocaleString();
-  document.getElementById('dEmpBtn').classList.toggle('on',myEmpSet.has(id));
+  renderDetailLawsuit();
   const deleteBtn=document.getElementById('dDeleteBtn');
   const storyObj=stories.find(x=>x.id===id);
   const isOwner=storyObj&&storyObj.browser_id===BID;
@@ -750,10 +720,51 @@ async function openDetail(id){
   toggleCardUpload(LAWYER_MODE);
   document.getElementById('dOverlay').classList.add('open');
   render();
-  await Promise.all([loadComments(id), loadLawsuitVotes(id)]);
+  await loadComments(id);
 }
 
 function switchDetail(id){document.getElementById('dOverlay').classList.remove('open');setTimeout(()=>openDetail(id),150);}
+
+function renderDetailLawsuit(){
+  const area=document.getElementById('dLawsuitArea');
+  if(!area||!curDetailId) return;
+  const s=stories.find(x=>x.id===curDetailId);
+  const total=s?(s.votes.lawyerVer+s.votes.lawyerUn+s.votes.normal):0;
+  const voted=!!myCardVotes[curDetailId];
+  if(LAWYER_MODE){
+    area.innerHTML=`<button class="emp-btn ${voted?'on':''}" id="dEmpBtn" onclick="handleDetailLawsuitClick()" style="white-space:nowrap;">소송 가능성 있어요 <strong id="dLawVoteN">${total}</strong></button>`;
+  } else {
+    if(total>0){
+      area.innerHTML=`<div class="law-badge" style="margin:0;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>단체소송 가능성 있음 <span style="margin-left:4px;font-weight:400;color:#999999;font-size:10px;">· ${total}명</span></div>`;
+    } else {
+      area.innerHTML='';
+    }
+  }
+}
+
+async function handleDetailLawsuitClick(){
+  if(!curDetailId) return;
+  const s=stories.find(x=>x.id===curDetailId); if(!s) return;
+  const isLawyer=LAWYER_MODE;
+  const btn=document.getElementById('dEmpBtn');
+  if(myCardVotes[curDetailId]){
+    await sb.from('lawsuit_votes').delete().eq('story_id',curDetailId).eq('browser_id',BID);
+    delete myCardVotes[curDetailId];
+    if(isLawyer) s.votes.lawyerUn=Math.max(0,s.votes.lawyerUn-1);
+    else s.votes.normal=Math.max(0,s.votes.normal-1);
+    btn.classList.remove('on');
+    await updateLawsuitPossible(curDetailId);
+  } else {
+    await sb.from('lawsuit_votes').insert({story_id:curDetailId,browser_id:BID,is_lawyer:isLawyer,is_verified:false});
+    myCardVotes[curDetailId]=true;
+    if(isLawyer) s.votes.lawyerUn++;
+    else s.votes.normal++;
+    btn.classList.add('on');
+    await updateLawsuitPossible(curDetailId);
+  }
+  renderDetailLawsuit();
+  render();
+}
 
 async function empDetail(){
   if(!curDetailId)return;
@@ -1012,14 +1023,14 @@ async function voteLawsuit(isLawyer, isVerified){
 }
 
 async function updateLawsuitPossible(storyId){
-  const {data}=await sb.from('lawsuit_votes').select('is_lawyer').eq('story_id',storyId);
-  const hasLawyer=data&&data.some(v=>v.is_lawyer);
+  const {data}=await sb.from('lawsuit_votes').select('id').eq('story_id',storyId);
+  const hasVotes=data&&data.length>0;
   await sb.from('stories').update({
-    lawsuit_possible:!!hasLawyer,
-    law_desc:hasLawyer?'변호사가 단체소송 가능성 있다고 판단했어요.':''
+    lawsuit_possible:!!hasVotes,
+    law_desc:hasVotes?'사용자들이 단체소송 가능성 있다고 판단했어요.':''
   }).eq('id',storyId);
   const s=stories.find(x=>x.id===storyId);
-  if(s){s.law=!!hasLawyer; s.lawdesc=hasLawyer?'변호사가 단체소송 가능성 있다고 판단했어요.':'';}
+  if(s){s.law=!!hasVotes; s.lawdesc=hasVotes?'사용자들이 단체소송 가능성 있다고 판단했어요.':'';}
   await loadStories();
 }
 
@@ -1131,8 +1142,7 @@ function applyLawyerMode(){
   const hiddenInput=document.getElementById('isLawyer');
   if(hiddenInput) hiddenInput.value=String(LAWYER_MODE);
   toggleCardUpload(LAWYER_MODE);
-  const dLabel=document.getElementById('dEmpLabel');
-  if(dLabel) dLabel.textContent=LAWYER_MODE?'소송 가능성 있어요':'나도 당했어요';
+  renderDetailLawsuit();
   render();
 }
 
