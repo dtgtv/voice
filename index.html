@@ -164,10 +164,11 @@ nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-con
 <nav>
   <a href="#" class="logo" style="flex-shrink:0;">VOICE<em>.</em></a>
   <div class="nav-right" style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;">
-    <button onclick="openMyPage()" style="position:relative;display:flex;align-items:center;gap:4px;background:transparent;border:1px solid var(--border);color:var(--ink2);padding:6px 10px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;flex-shrink:0;">
-      마이페이지
-      <span id="notisBadge" style="display:none;position:absolute;top:-6px;right:-6px;background:#E8192C;color:white;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;align-items:center;justify-content:center;"></span>
-    </button>
+    <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:#F5F5F5;border:1px solid #E0E0E0;border-radius:4px;cursor:pointer;flex-shrink:0;" onclick="openMyPage()">
+      <div style="width:22px;height:22px;border-radius:50%;background:#111111;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0;" id="navNickInitial">?</div>
+      <span style="font-size:12px;font-weight:500;color:var(--ink);white-space:nowrap;max-width:100px;overflow:hidden;text-overflow:ellipsis;" id="navNickname">로딩중...</span>
+      <span id="notisBadge" style="display:none;background:#E8192C;color:white;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:10px;padding:0 4px;align-items:center;justify-content:center;"></span>
+    </div>
     <button id="lawyerModeBtn" onclick="toggleLawyerMode()" style="display:flex;align-items:center;gap:4px;background:transparent;border:1px solid var(--border);color:var(--ink2);padding:6px 10px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;flex-shrink:0;">변호사</button>
     <button onclick="confirmLogout()" style="display:flex;align-items:center;gap:4px;background:transparent;border:1px solid var(--border);color:var(--ink2);padding:6px 10px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;flex-shrink:0;">로그아웃</button>
     <button class="btn-write" onclick="openWrite()" style="white-space:nowrap;flex-shrink:0;padding:7px 12px;font-size:12px;">사연 올리기</button>
@@ -1159,6 +1160,14 @@ async function initNickname(){
     await sb.from('user_profiles').insert({browser_id:BID, nickname:MY_NICK});
     localStorage.setItem('voice_nick_'+BID, MY_NICK);
   }
+  updateNavNickname();
+}
+
+function updateNavNickname(){
+  const el=document.getElementById('navNickname');
+  const initial=document.getElementById('navNickInitial');
+  if(el) el.textContent=MY_NICK;
+  if(initial) initial.textContent=MY_NICK ? MY_NICK[0] : '?';
 }
 
 async function getUniqueNickname(){
